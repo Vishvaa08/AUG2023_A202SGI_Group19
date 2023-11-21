@@ -1,4 +1,4 @@
-package com.example.bloodunitytest;
+package com.example.bloodunity;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -16,6 +16,7 @@ public class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapte
     int images[];
     Context context;
 
+    //constructor
     public recyclerViewAdapter(Context ct, String itemName[], String itemDesc[], String itemPrice[], int itemImages[]){
         context = ct;
         data1 = itemName;
@@ -24,6 +25,7 @@ public class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapte
         images = itemImages;
     }
 
+    //oncreateviewholder sets xml layout page
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -32,6 +34,7 @@ public class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapte
         return new MyViewHolder(view);
     }
 
+    //binds the values to the widgets in the xml page
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.itemName.setText(data1[position]);
@@ -45,6 +48,7 @@ public class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapte
         return images.length;
     }
 
+    //initialising all values needed for widgets
     public class MyViewHolder extends RecyclerView.ViewHolder{
 
         TextView itemName, itemDescription, itemPrice;
