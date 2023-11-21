@@ -1,7 +1,10 @@
-package com.example.test2;
+package com.example.bloodunity;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -11,45 +14,48 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 public class register extends AppCompatActivity {
 
-    EditText firstName, lastName, userEmail, userPassword, userCPassword, userAddress;
+    EditText firstName, lastName, userEmail, userPassword, userAddress;
     Spinner bloodType;
-    FirebaseDatabase database;
     DatabaseReference reference;
+    private StorageReference storageReference;
+    ImageView userPicture;
+    String imageUrl;
+    Uri uri;
+    DrawerLayout drawerLayout;
+    boolean allFieldsChecked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
 
-        ImageView backBtn = (ImageView) findViewById(R.id.back_button); //onClick usage for back button (line 26-31)
-        ImageView menuBtn = (ImageView) findViewById(R.id.menu_button); //onClick usage for menu button (line 33-38)
         TextView pageTitle = (TextView) findViewById(R.id.page_title); //sets page header (line 40)
+        pageTitle.setText("Register");
 
         Spinner spinner = (Spinner) findViewById(R.id.blood_type); //spinner dropdown for blood type (line 42-47)
 
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(register.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        menuBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(register.this, "Soon come", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        pageTitle.setText("Register");
+        drawerLayout = findViewById(R.id.drawer);
 
         //creating the array adapter (line 43)
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.blood_type, android.R.layout.simple_spinner_item);
@@ -62,73 +68,180 @@ public class register extends AppCompatActivity {
         lastName = findViewById(R.id.last_name);
         userEmail = findViewById(R.id.user_email);
         userPassword = findViewById(R.id.user_password);
-        userCPassword = findViewById(R.id.user_cpassword);
         userAddress = findViewById(R.id.user_address);
         bloodType = findViewById(R.id.blood_type);
+        userPicture = findViewById(R.id.user_picture);
 
         reference = FirebaseDatabase.getInstance().getReference().child("users");
 
         Button btnRegister = (Button) findViewById(R.id.register_button);
         Button btnLogin = (Button) findViewById(R.id.login_button);
 
-        //onclick for when login button is pressed
+        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK){
+                            Intent data = result.getData();
+                            uri = data.getData();
+                            userPicture.setImageURI(uri);
+                        }else {
+                            Toast.makeText(register.this, "No Image", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+        );
+
+        userPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent photoPicker = new Intent(Intent.ACTION_PICK);
+                photoPicker.setType("image/*");
+                activityResultLauncher.launch(photoPicker);
+            }
+        });
+
+
+        //onclick for when register button is pressed
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                validateRegisterForm();
+                allFieldsChecked = CheckFields();
 
+                if(allFieldsChecked){
+                    saveData();
+                }
+            }
+        });
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(register.this, login.class);
+                startActivity(intent);
             }
         });
 
     }
+    public void btnMenu(View view){
+        openDrawer(drawerLayout);
+    }
 
-    private Boolean validateRegisterForm(){
+    public static void openDrawer(DrawerLayout drawerLayout){
+        drawerLayout.openDrawer(GravityCompat.START);
+    }
 
-        String valueFirstName = firstName.getText().toString();
-        String valueLastName   = lastName.getText().toString();
-        String valueEmail  = userEmail.getText().toString();
-        String valuePassword  = userPassword.getText().toString();
-        String valueCPassword = userCPassword.getText().toString();
-        String passwordValidation = "^" + "(?=.*[0-9])" + "(?=.*[a-z])" + "(?=.*[A-Z])" + "(?=.*[0-9])" + "(?=.*[@#$%^&+=])" + ".{6,}" + "$";
-        String valueAddress  = userAddress.getText().toString();
-        String blood = bloodType.getSelectedItem().toString();
+    public void ClickLogo(View view){
+        closeDrawer(drawerLayout);
+    }
 
-        if (valueFirstName.isEmpty()) {
-            firstName.setError("Field cannot be empty");
-            return false;
-        }else if (valueLastName.isEmpty()){
-            lastName.setError("Field cannot be empty");
-            return false;
-        }else if (valueEmail.isEmpty()){
-            userEmail.setError("Field cannot be empty");
-            return false;
-        }else if (valuePassword.isEmpty()) {
-            userPassword.setError("Field cannot be empty");
-            return false;
-        }else if (!valuePassword.matches(passwordValidation)) {
-            userPassword.setError("Password is too weak");
-            return false;
-        }else if (valueCPassword.isEmpty()){
-            userCPassword.setError("Field cannot be empty");
-            return false;
-        }else if (valueAddress.isEmpty()){
-            userAddress.setError("Field cannot be empty");
-            return false;
-        }else{
-            firstName.setError(null);
-            lastName.setError(null);
-            userEmail.setError(null);
-            userPassword.setError(null);
-            userAddress.setError(null);
-            insertUserData();
-            return true;
+    public static void closeDrawer(DrawerLayout drawerLayout){
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START);
         }
     }
 
-    //String email pattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+    public void ClickHome(View view){redirectActivity(this, homepage.class);}
+    public void ClickRegister(View view){
+        recreate();
+    }
+    public void ClickShop(View view){
+        redirectActivity(this, shop.class);
+    }
+    public void ClickAdmin(View view){redirectActivity(this, adminLock.class);}
 
-    private void insertUserData(){
+    public static void redirectActivity(Activity activity, Class Class){
+        Intent intent = new Intent(activity,Class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.startActivity(intent);
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        closeDrawer(drawerLayout);
+    }
+
+    //13 Nov Validation testing
+    private boolean CheckFields(){
+
+        if(firstName.length() == 0){
+            firstName.setError("Field is required!");
+            return false;
+        }else if(firstName.length() <= 2){
+            firstName.setError("Input too short!");
+            return false;
+        }else if(firstName.length() >= 15){
+            firstName.setError("Input too long!");
+            return false;
+        }
+
+        if(lastName.length() == 0){
+            lastName.setError("Field is required!");
+            return false;
+        }else if(lastName.length() <= 2){
+            lastName.setError("Input too short!");
+            return false;
+        }else if(lastName.length() >= 15){
+            lastName.setError("Input too long!");
+            return false;
+        }
+        /*
+        String emailPattern = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+        if(userEmail.length() == 0){
+            userEmail.setError("Field is required!");
+            return false;
+        }else if(!userEmail.getText().toString().matches(emailPattern)){
+            userEmail.setError("Invalid Email!");
+            return false;
+        }
+
+         */
+
+        if(userPassword.length() == 0){
+            userPassword.setError("Field is required!");
+            return false;
+        }else if(userPassword.length() <= 7){
+            userPassword.setError("Password too short!");
+            return false;
+        }
+
+        if(userAddress.length() == 0){
+            userAddress.setError("Field is required!");
+            return false;
+        }
+
+        saveData();
+        return true;
+    }
+
+
+    public void saveData(){
+
+        storageReference = FirebaseStorage.getInstance().getReference().child("uploads")
+                .child(uri.getLastPathSegment());
+
+        storageReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                while (!uriTask.isComplete());
+                Uri urlImage = uriTask.getResult();
+                imageUrl = urlImage.toString();
+                uploadData();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(register.this, "No image selected!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+    public void uploadData(){
         String fname = firstName.getText().toString();
         String lname = lastName.getText().toString();
         String email = userEmail.getText().toString();
@@ -136,10 +249,24 @@ public class register extends AppCompatActivity {
         String address = userAddress.getText().toString();
         String blood = bloodType.getSelectedItem().toString();
 
-        RegisterHelperClass registerHelperClass = new RegisterHelperClass(fname, lname, email, password, address, blood);
+        RegisterHelperClass registerHelperClass = new RegisterHelperClass(fname, lname, email, password, address, blood, imageUrl);
 
-        reference.push().setValue(registerHelperClass);
-        Toast.makeText(register.this, "Successful Register!", Toast.LENGTH_SHORT).show();
-    }
+        FirebaseDatabase.getInstance().getReference("users").child(fname)
+                .setValue(registerHelperClass).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Toast.makeText(register.this, "Saved", Toast.LENGTH_SHORT).show();
 
+                            Intent intent = new Intent(register.this, login.class);
+                            startActivity(intent);
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(register.this, e.getMessage().toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
+}
