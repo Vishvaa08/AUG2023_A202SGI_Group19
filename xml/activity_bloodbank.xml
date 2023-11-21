@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".bloodbank">
+
+    <include layout="@layout/app_header" > </include>
+
+    <Button
+        android:id="@+id/btnB"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="17dp"
+        android:layout_marginEnd="214dp"
+        android:layout_marginBottom="405dp"
+        android:background="@color/red"
+        android:text="@string/b"
+        android:textSize="45sp"/>
+
+    <Button
+        android:id="@+id/btnAB"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="17dp"
+        android:layout_marginEnd="214dp"
+        android:layout_marginBottom="200dp"
+        android:background="@color/red"
+        android:text="@string/ab"
+        android:textSize="45sp"/>
+
+    <Button
+        android:id="@+id/btnO"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="213dp"
+        android:layout_marginEnd="17dp"
+        android:layout_marginBottom="200dp"
+        android:background="@color/red"
+        android:text="@string/o"
+        android:textSize="45sp"/>
+
+    <Button
+        android:id="@+id/btnA"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="17dp"
+        android:layout_marginBottom="405dp"
+        android:background="@color/red"
+        android:text="@string/a"
+        android:textSize="45sp"/>
+
+
+</RelativeLayout>
