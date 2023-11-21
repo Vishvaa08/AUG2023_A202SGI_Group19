@@ -10,10 +10,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.BloodUnityTest"
+        android:theme="@style/Theme.BloodUnity"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".homepage"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,8 +21,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".register"/>
-        <activity android:name=".shop"/>
+        <activity android:name=".shop" />
+        <activity android:name=".ViewUsers" />
+        <activity android:name=".login" />
+        <activity android:name=".register" />
+        <activity android:name=".editPoints" />
+        <activity android:name=".adminLock" />
+        <activity android:name=".viewBlood" />
+        <activity android:name=".deleteBlood" />
+        <activity android:name=".addBlood" />
+        <activity android:name="account"/>
+        <activity android:name=".appointment"/>
     </application>
 
 </manifest>
