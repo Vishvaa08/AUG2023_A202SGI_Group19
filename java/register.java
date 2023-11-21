@@ -72,7 +72,7 @@ public class register extends AppCompatActivity {
         bloodType = findViewById(R.id.blood_type);
         userPicture = findViewById(R.id.user_picture);
 
-        reference = FirebaseDatabase.getInstance().getReference().child("users");
+        reference = FirebaseDatabase.getInstance().getReference().child("Users");
 
         Button btnRegister = (Button) findViewById(R.id.register_button);
         Button btnLogin = (Button) findViewById(R.id.login_button);
@@ -152,6 +152,15 @@ public class register extends AppCompatActivity {
     }
     public void ClickAdmin(View view){redirectActivity(this, adminLock.class);}
 
+    // when user click Home in the navigation menu, it will direct user from login page to Account page
+    public void ClickAccount(View view) {redirectActivity(this, account.class);}
+
+    // when user click Help Center in the navigation menu, it will direct user from login page to help center page
+    public void ClickHelpCenter(View view) {redirectActivity(this, helpcenter.class);}
+
+    // when user click Help Center in the navigation menu, it will direct user from login page to help center page
+    public void ClickAppointment(View view) {redirectActivity(this, appointment.class);}
+
     public static void redirectActivity(Activity activity, Class Class){
         Intent intent = new Intent(activity,Class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -188,7 +197,6 @@ public class register extends AppCompatActivity {
             lastName.setError("Input too long!");
             return false;
         }
-        /*
         String emailPattern = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
         if(userEmail.length() == 0){
@@ -198,8 +206,6 @@ public class register extends AppCompatActivity {
             userEmail.setError("Invalid Email!");
             return false;
         }
-
-         */
 
         if(userPassword.length() == 0){
             userPassword.setError("Field is required!");
@@ -251,14 +257,14 @@ public class register extends AppCompatActivity {
 
         RegisterHelperClass registerHelperClass = new RegisterHelperClass(fname, lname, email, password, address, blood, imageUrl);
 
-        FirebaseDatabase.getInstance().getReference("users").child(fname)
+        FirebaseDatabase.getInstance().getReference("Users").child(fname)
                 .setValue(registerHelperClass).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
                             Toast.makeText(register.this, "Saved", Toast.LENGTH_SHORT).show();
 
-                            Intent intent = new Intent(register.this, login.class);
+                            Intent intent = new Intent(register.this, homepage.class);
                             startActivity(intent);
                         }
                     }

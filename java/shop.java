@@ -68,6 +68,15 @@ public class shop extends AppCompatActivity {
         redirectActivity(this, adminLock.class);
     }
 
+    // when user click Home in the navigation menu, it will direct user from login page to Account page
+    public void ClickAccount(View view) {redirectActivity(this, account.class);}
+
+    // when user click Help Center in the navigation menu, it will direct user from login page to help center page
+    public void ClickHelpCenter(View view) {redirectActivity(this, helpcenter.class);}
+
+    // when user click Help Center in the navigation menu, it will direct user from login page to help center page
+    public void ClickAppointment(View view) {redirectActivity(this, appointment.class);}
+
     public static void redirectActivity(Activity activity, Class Class){
         Intent intent = new Intent(activity,Class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
