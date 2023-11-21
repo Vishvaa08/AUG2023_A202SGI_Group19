@@ -1,58 +1,42 @@
 package com.example.bloodunity;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Paint;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
-public class adminLock extends AppCompatActivity {
+public class homepage extends AppCompatActivity {
 
     DrawerLayout drawerLayout;
-    EditText adminPassword;
-    Button tryPass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_lock);
+        setContentView(R.layout.activity_homepage);
 
-        //For setting the page title on create
-        TextView page_title = findViewById(R.id.page_title);
-        page_title.setText("Admin Lock");
-
-        //find view by IDs from activity admin lock xml
+        //find view by id for nav drawer from activity homepage
         drawerLayout = findViewById(R.id.drawer);
-        adminPassword = findViewById(R.id.adminPassword);
-        tryPass = findViewById(R.id.btnTryPass);
 
-        //onclick when button is pressed to try password
-        tryPass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        //for setting page title
+        TextView page_title = findViewById(R.id.page_title);
+        page_title.setText("Homepage");
 
-                String pwd = adminPassword.getText().toString();
+        TextView title1 = (TextView) findViewById(R.id.pic1Title);
+        TextView title2 = (TextView) findViewById(R.id.pic2Title);
+        TextView title3 = (TextView) findViewById(R.id.pic3Title);
 
-                if(pwd.equals("hospital")){
-
-                    Toast.makeText(adminLock.this, "Welcome Admin!", Toast.LENGTH_SHORT).show();
-
-                    Intent intent = new Intent(adminLock.this, ViewUsers.class);
-                    startActivity(intent);
-                }else{
-                    Toast.makeText(adminLock.this, "Incorrect Password!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        //for underlining titles
+        title1.setPaintFlags(title1.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        title2.setPaintFlags(title2.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        title3.setPaintFlags(title3.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
     }
-    //line 56 to 95 is for the navigation drawer
+    //line 40 to 79 is for nav drawer
     public void btnMenu(View view){
         openDrawer(drawerLayout);
     }
@@ -70,8 +54,8 @@ public class adminLock extends AppCompatActivity {
             drawerLayout.closeDrawer(GravityCompat.START);
         }
     }
-    //onclicks for navigation drawer items
-    public void ClickHome(View view){redirectActivity(this, homepage.class);}
+    //onclick for nav drawer items
+    public void ClickHome(View view){recreate();}
     public void ClickRegister(View view){
         redirectActivity(this, register.class);
     }
@@ -79,7 +63,7 @@ public class adminLock extends AppCompatActivity {
         redirectActivity(this, shop.class);
     }
     public void ClickAdmin(View view){
-        recreate();
+        redirectActivity(this, adminLock.class);
     }
 
     // when user click Home in the navigation menu, it will direct user from login page to Account page
